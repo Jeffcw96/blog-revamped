@@ -5,6 +5,7 @@ import { humanize, markdownify, slugify } from "@lib/utils/textConverter";
 import SimilarPosts from "@partials/SimilarPosts";
 import shortcodes from "@shortcodes/all";
 import { MDXRemote } from "next-mdx-remote";
+import rehypeHighlight from "rehype-highlight";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -14,13 +15,19 @@ const PostSingle = ({ post, posts, authors, slug }) => {
   description = description ? description : content.slice(0, 120);
   const similarPosts = similerItems(post, posts, slug);
 
+  const options = {
+    mdxOptions: {
+      remarkPlugins: [],
+      rehypePlugins: [rehypeHighlight],
+    },
+  };
   return (
     <>
       <section className="section">
         <div className="container">
           <article className="text-center">
             {markdownify(title, "h1", "h2")}
-            <ul className="mt-4 mb-8 flex flex-wrap items-center justify-center space-x-3 text-text">
+            <ul className="mb-8 mt-4 flex flex-wrap items-center justify-center space-x-3 text-text">
               <li>
                 {authors
                   .filter((author) =>
@@ -73,10 +80,14 @@ const PostSingle = ({ post, posts, authors, slug }) => {
               />
             )}
             <div className="content mb-16 text-left">
-              <MDXRemote {...mdxContent} components={shortcodes} />
+              <MDXRemote
+                {...mdxContent}
+                components={shortcodes}
+                options={options}
+              />
             </div>
             <div className="flex flex-wrap items-center justify-between">
-              <ul className="mr-4 mb-4 space-x-3">
+              <ul className="mb-4 mr-4 space-x-3">
                 {tags.map((tag, i) => (
                   <li className="inline-block" key={`tag-${i}`}>
                     <Link
